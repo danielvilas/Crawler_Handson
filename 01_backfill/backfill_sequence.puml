@@ -1,0 +1,56 @@
+@startuml
+skinparam backgroundColor #0F172A
+skinparam sequenceParticipantBackgroundColor #1E293B
+skinparam sequenceParticipantBorderColor #334155
+skinparam sequenceParticipantFontColor #F1F5F9
+skinparam sequenceParticipantFontSize 16
+skinparam sequenceArrowColor #64748B
+skinparam sequenceArrowFontColor #94A3B8
+skinparam sequenceArrowFontSize 14
+skinparam sequenceLifeLineBorderColor #334155
+skinparam sequenceBoxBackgroundColor #1E293B
+skinparam sequenceBoxBorderColor #38BDF820
+skinparam sequenceGroupBackgroundColor #38BDF808
+skinparam sequenceGroupBorderColor #38BDF840
+skinparam sequenceGroupFontColor #38BDF8
+skinparam sequenceGroupBodyBackgroundColor #0F172A
+skinparam noteBorderColor #334155
+skinparam noteBackgroundColor #1E293B
+skinparam noteFontColor #94A3B8
+skinparam noteFontSize 14
+
+title Backfill — Sequence Diagram
+
+participant "GeneralCrawler" as B #1E293B
+participant "EngineCrawler" as E #1E293B
+participant "Context" as C #1E293B
+participant "MongoDB" as DB #1E293B
+
+B -> DB : get_categories(newspaper)
+DB --> B : [cat_1, cat_2, … cat_n]
+
+loop for each category
+
+  B -> E : find initial page
+  loop while start page is unknown
+    E -> E : get_page(n)
+    E -> E : extractArticles
+    E -> C : store_articles()
+    C -> DB : save(articles)
+    E -> E : n = f(n, context)
+  end
+  E --> B : start_page = n
+
+  loop while response not empty
+    B -> E : get_page(n)
+    E --> B : articles
+    B -> E : extractArticles
+    E -> C : store_articles()
+    C -> DB : save(articles)
+    B -> B : n += 1
+  end
+
+end
+
+B -> DB : mark_category_done(cat)
+@enduml

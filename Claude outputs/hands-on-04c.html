@@ -1,0 +1,73 @@
+<section id="hands-on-04c" data-transition="fade" style="display:flex;flex-direction:column;gap:16px;padding:68px 96px 48px;background:#0f172a;font-family:'IBM Plex Sans',Arial,sans-serif;color:#f1f5f9">
+
+  <div style="display:flex;align-items:center;gap:16px">
+    <p style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:#f97316">06</p>
+    <p style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#64748b">Hands-On · Insert &amp; query</p>
+  </div>
+  <h1 style="font-size:50px;font-weight:700;line-height:1.05;color:#f8fafc">Insert with <span style="color:#34d399">repo.save()</span></h1>
+
+  <div style="display:flex;gap:18px;flex:1;align-items:stretch">
+
+    <!-- LEFT: code -->
+    <div style="flex:1.4;background:#0d1b2a;border:1px solid #334155;border-radius:14px;padding:20px 24px;display:flex;flex-direction:column">
+      <p style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#475569;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px">hands-on/06-insert-with-model.py</p>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.85;color:#94a3b8;flex:1">
+        <p><span style="color:#38bdf8">from</span> pymongo <span style="color:#38bdf8">import</span> MongoClient</p>
+        <p><span style="color:#38bdf8">from</span> datetime <span style="color:#38bdf8">import</span> datetime</p>
+        <p><span style="color:#38bdf8">from</span> article_model <span style="color:#38bdf8">import</span> <span style="color:#34d399">Article</span>, <span style="color:#34d399">ArticleRepository</span></p>
+        <p>&nbsp;</p>
+        <p>client = MongoClient(<span style="color:#f59e0b">"mongodb://root:example@localhost:27017/"</span>)</p>
+        <p>db = client[<span style="color:#f59e0b">"news_db"</span>]</p>
+        <p>repo = <span style="color:#34d399">ArticleRepository</span>(database=db)</p>
+        <p>&nbsp;</p>
+        <p><span style="color:#475569"># Pydantic validates before touching MongoDB</span></p>
+        <p>article = <span style="color:#34d399">Article</span>(</p>
+        <p>&nbsp;&nbsp;title=<span style="color:#f59e0b">"El paro baja en octubre"</span>,</p>
+        <p>&nbsp;&nbsp;url=<span style="color:#f59e0b">"https://elpais.com/economia/paro.html"</span>,</p>
+        <p>&nbsp;&nbsp;np_name=<span style="color:#f59e0b">"elpais"</span>,</p>
+        <p>&nbsp;&nbsp;date=datetime(<span style="color:#f97316">2024</span>, <span style="color:#f97316">10</span>, <span style="color:#f97316">1</span>),</p>
+        <p>&nbsp;&nbsp;tags=[<span style="color:#f59e0b">"econom&#237;a"</span>, <span style="color:#f59e0b">"trabajo"</span>],</p>
+        <p>)</p>
+        <p>repo.save(article)</p>
+        <p>print(<span style="color:#f59e0b">f"Inserted: <span style="color:#a78bfa">{article.id}</span>"</span>)</p>
+        <p>&nbsp;</p>
+        <p><span style="color:#475569"># Query returns typed Article objects</span></p>
+        <p><span style="color:#38bdf8">for</span> art <span style="color:#38bdf8">in</span> repo.find_by({<span style="color:#f59e0b">"np_name"</span>: <span style="color:#f59e0b">"elpais"</span>}):</p>
+        <p>&nbsp;&nbsp;print(art.date, art.title)</p>
+      </div>
+    </div>
+
+    <!-- RIGHT: annotations -->
+    <div style="flex:1;display:flex;flex-direction:column;gap:10px">
+
+      <div style="background:#1e293b;border:1px solid #34d399;border-radius:10px;padding:14px 18px">
+        <p style="font-size:13px;font-weight:700;color:#34d399;margin-bottom:4px">repo.save(article)</p>
+        <p style="font-size:13px;color:#64748b;line-height:1.5">Serialises the Pydantic model to BSON and calls <span style="color:#94a3b8;font-family:'JetBrains Mono',monospace">insert_one</span>. After the call, <span style="color:#94a3b8;font-family:'JetBrains Mono',monospace">article.id</span> is populated with the new ObjectId.</p>
+      </div>
+
+      <div style="background:#1e293b;border:1px solid #a78bfa;border-radius:10px;padding:14px 18px">
+        <p style="font-size:13px;font-weight:700;color:#a78bfa;margin-bottom:4px">article.id after save</p>
+        <p style="font-size:13px;color:#64748b;line-height:1.5">The repository mutates the model in-place, setting <span style="color:#94a3b8;font-family:'JetBrains Mono',monospace">id</span> to the inserted <span style="color:#94a3b8;font-family:'JetBrains Mono',monospace">_id</span>. Print or store it for later retrieval.</p>
+      </div>
+
+      <div style="background:#1e293b;border:1px solid #38bdf8;border-radius:10px;padding:14px 18px">
+        <p style="font-size:13px;font-weight:700;color:#38bdf8;margin-bottom:4px">repo.find_by(filter)</p>
+        <p style="font-size:13px;color:#64748b;line-height:1.5">Takes a pymongo filter dict, returns typed Article objects. Use <span style="color:#94a3b8;font-family:'JetBrains Mono',monospace">art.title</span> not <span style="color:#94a3b8;font-family:'JetBrains Mono',monospace">art["title"]</span> — IDE autocomplete works.</p>
+      </div>
+
+      <div style="background:#0d2218;border:1px solid #34d39940;border-radius:10px;padding:12px 16px">
+        <p style="font-size:12px;font-weight:700;color:#34d399;margin-bottom:6px">Run it</p>
+        <p style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#94a3b8">cd hands-on/</p>
+        <p style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#94a3b8">python 06-insert-with-model.py</p>
+      </div>
+
+      <div style="background:#1c0a0a;border:1px solid #f8717140;border-radius:10px;padding:12px 16px">
+        <p style="font-size:12px;font-weight:700;color:#f87171;margin-bottom:4px">Raw dict vs typed model</p>
+        <p style="font-size:12px;color:#64748b;line-height:1.6">Raw: <span style="color:#94a3b8;font-family:'JetBrains Mono',monospace">doc["tittle"]</span> — typo caught at runtime only. Typed: <span style="color:#94a3b8;font-family:'JetBrains Mono',monospace">art.tittle</span> — <span style="color:#f87171;font-weight:700">AttributeError</span> and IDE underline immediately.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <aside>Step 6. With ArticleRepository wired up, inserting a document is creating a typed Python object and calling repo.save(). Pydantic validates every field at construction time — pass a string where a datetime is expected and you get a ValidationError before the database is touched. After repo.save(), the article's id field is populated in-place with the MongoDB ObjectId, which you can print or use for later lookups. find_by() takes a standard pymongo filter dict and returns a generator of Article objects — you access fields with dot notation (art.title, art.date) rather than dict subscript (doc["title"]), which means your IDE can autocomplete and static analysers can catch typos. The key contrast to drive home: raw pymongo returns dicts, so typos in key names surface only at runtime; typed models surface them at write time, in your editor.</aside>
+</section>

@@ -1,0 +1,70 @@
+<section id="hands-on-04b" data-transition="fade" style="display:flex;flex-direction:column;gap:16px;padding:68px 96px 48px;background:#0f172a;font-family:'IBM Plex Sans',Arial,sans-serif;color:#f1f5f9">
+
+  <div style="display:flex;align-items:center;gap:16px">
+    <p style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:#f97316">05</p>
+    <p style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#64748b">Hands-On · Typed model</p>
+  </div>
+  <h1 style="font-size:50px;font-weight:700;line-height:1.05;color:#f8fafc">Article model with <span style="color:#a78bfa">Pydantic</span></h1>
+
+  <div style="display:flex;gap:18px;flex:1;align-items:stretch">
+
+    <!-- LEFT: code -->
+    <div style="flex:1.4;background:#0d1b2a;border:1px solid #334155;border-radius:14px;padding:20px 24px;display:flex;flex-direction:column">
+      <p style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#475569;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px">hands-on/article_model.py</p>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.85;color:#94a3b8;flex:1">
+        <p><span style="color:#475569"># pip install pydantic-mongo pymongo</span></p>
+        <p><span style="color:#38bdf8">from</span> pydantic_mongo <span style="color:#38bdf8">import</span> <span style="color:#a78bfa">AbstractRepository</span>, <span style="color:#a78bfa">ObjectIdField</span></p>
+        <p><span style="color:#38bdf8">from</span> pydantic <span style="color:#38bdf8">import</span> <span style="color:#a78bfa">BaseModel</span></p>
+        <p><span style="color:#38bdf8">from</span> datetime <span style="color:#38bdf8">import</span> datetime</p>
+        <p><span style="color:#38bdf8">from</span> typing <span style="color:#38bdf8">import</span> Optional</p>
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
+        <p><span style="color:#38bdf8">class</span> <span style="color:#34d399">Article</span>(<span style="color:#a78bfa">BaseModel</span>):</p>
+        <p>&nbsp;&nbsp;id: <span style="color:#a78bfa">ObjectIdField</span> = <span style="color:#f97316">None</span></p>
+        <p>&nbsp;&nbsp;title: <span style="color:#38bdf8">str</span></p>
+        <p>&nbsp;&nbsp;url: <span style="color:#38bdf8">str</span></p>
+        <p>&nbsp;&nbsp;np_name: <span style="color:#38bdf8">str</span></p>
+        <p>&nbsp;&nbsp;date: datetime</p>
+        <p>&nbsp;&nbsp;body: Optional[<span style="color:#38bdf8">str</span>] = <span style="color:#f97316">None</span></p>
+        <p>&nbsp;&nbsp;tags: list[<span style="color:#38bdf8">str</span>] = []</p>
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
+        <p><span style="color:#38bdf8">class</span> <span style="color:#34d399">ArticleRepository</span>(<span style="color:#a78bfa">AbstractRepository</span>[<span style="color:#34d399">Article</span>]):</p>
+        <p>&nbsp;&nbsp;<span style="color:#38bdf8">class</span> <span style="color:#34d399">Meta</span>:</p>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;collection_name = <span style="color:#f59e0b">"articles"</span></p>
+      </div>
+    </div>
+
+    <!-- RIGHT: annotations -->
+    <div style="flex:1;display:flex;flex-direction:column;gap:10px">
+
+      <div style="background:#1e293b;border:1px solid #a78bfa;border-radius:10px;padding:14px 18px">
+        <p style="font-size:13px;font-weight:700;color:#a78bfa;margin-bottom:4px">pydantic-mongo</p>
+        <p style="font-size:13px;color:#64748b;line-height:1.5">Thin bridge between Pydantic v2 and pymongo. Install: <span style="color:#94a3b8;font-family:'JetBrains Mono',monospace">pip install pydantic-mongo pymongo</span>. No ODM magic — just typed serialisation.</p>
+      </div>
+
+      <div style="background:#1e293b;border:1px solid #f59e0b;border-radius:10px;padding:14px 18px">
+        <p style="font-size:13px;font-weight:700;color:#f59e0b;margin-bottom:4px">ObjectIdField</p>
+        <p style="font-size:13px;color:#64748b;line-height:1.5">Maps MongoDB's <span style="color:#94a3b8;font-family:'JetBrains Mono',monospace">_id</span> to a Python field. Defaults to <span style="color:#94a3b8;font-family:'JetBrains Mono',monospace">None</span> before insert; populated by <span style="color:#94a3b8;font-family:'JetBrains Mono',monospace">repo.save()</span>.</p>
+      </div>
+
+      <div style="background:#1e293b;border:1px solid #34d399;border-radius:10px;padding:14px 18px">
+        <p style="font-size:13px;font-weight:700;color:#34d399;margin-bottom:4px">AbstractRepository[Article]</p>
+        <p style="font-size:13px;color:#64748b;line-height:1.5">Generic base giving you <span style="color:#94a3b8;font-family:'JetBrains Mono',monospace">save()</span>, <span style="color:#94a3b8;font-family:'JetBrains Mono',monospace">find_by()</span>, <span style="color:#94a3b8;font-family:'JetBrains Mono',monospace">find_one_by()</span>, <span style="color:#94a3b8;font-family:'JetBrains Mono',monospace">delete()</span> typed to your model.</p>
+      </div>
+
+      <div style="background:#1e293b;border:1px solid #38bdf8;border-radius:10px;padding:14px 18px">
+        <p style="font-size:13px;font-weight:700;color:#38bdf8;margin-bottom:4px">Pydantic validation</p>
+        <p style="font-size:13px;color:#64748b;line-height:1.5">Every field validated before MongoDB is touched. Wrong type raises <span style="color:#94a3b8;font-family:'JetBrains Mono',monospace">ValidationError</span> at construction time.</p>
+      </div>
+
+      <div style="background:#0d2218;border:1px solid #34d39940;border-radius:10px;padding:12px 16px">
+        <p style="font-size:12px;font-weight:700;color:#34d399;margin-bottom:4px">Why bother?</p>
+        <p style="font-size:12px;color:#64748b;line-height:1.6">Raw pymongo returns plain dicts. A typed model gives you autocomplete, early type errors, and a single source of truth for the schema.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <aside>Step 5. pydantic-mongo bridges Pydantic v2 models with pymongo — no full ODM, just typed serialisation and a small repository interface. Article inherits from BaseModel: title, url, np_name are required strings; date is a datetime; body is optional; tags defaults to an empty list. The id field uses ObjectIdField which serialises MongoDB's _id BSON ObjectId into a Python-friendly form and defaults to None before the document is saved. ArticleRepository extends AbstractRepository[Article] — the only required class attribute is Meta.collection_name. In exchange you get save(), find_by(), find_one_by() and delete() that accept and return typed Article objects instead of raw dicts. Pydantic validates every field at construction time, so bad data raises a ValidationError before touching the database.</aside>
+</section>

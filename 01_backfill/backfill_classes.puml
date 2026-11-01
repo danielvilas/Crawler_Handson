@@ -1,0 +1,104 @@
+@startuml backfill_classes
+
+skinparam backgroundColor #0F172A
+skinparam classBackgroundColor #1E293B
+skinparam classBorderColor #334155
+skinparam classFontColor #F1F5F9
+skinparam classFontSize 15
+skinparam classAttributeFontColor #94A3B8
+skinparam classAttributeFontSize 14
+skinparam arrowColor #64748B
+skinparam arrowFontColor #94A3B8
+skinparam arrowFontSize 13
+skinparam noteBorderColor #334155
+skinparam noteBackgroundColor #1E293B
+skinparam noteFontColor #94A3B8
+skinparam noteFontSize 13
+skinparam stereotypeFontColor #38BDF8
+skinparam stereotypeFontSize 13
+
+title Backfill — Class Diagram
+
+' ---------------------------------------------------------------------------
+' Data classes
+' ---------------------------------------------------------------------------
+
+class Category {
+  + url : str
+  + name : str
+}
+
+class Article {
+  + url : str
+  + date : date
+  + category : str
+  + newspaper : str
+}
+
+' ---------------------------------------------------------------------------
+' MongoDB
+' ---------------------------------------------------------------------------
+
+class MongoDB {
+  + get_categories(newspaper: str) : list[Category]
+  + save(articles: list[Article]) : None
+  + mark_category_done(cat: Category) : None
+}
+
+' ---------------------------------------------------------------------------
+' Context
+' ---------------------------------------------------------------------------
+
+class Context {
+  - db : MongoDB
+  - _buffer : list[Article]
+  + last_date : date
+  --
+  + store_articles(articles: list[Article]) : None
+  + collected() : list[Article]
+}
+
+' ---------------------------------------------------------------------------
+' GeneralCrawler
+' ---------------------------------------------------------------------------
+
+class GeneralCrawler {
+  # db : MongoDB
+  # context : Context
+  --
+  + backfill(newspaper, start_date, end_date) : list[Article]
+  # find_initial_page(cat, start_date, end_date) : int
+  # get_page(cat: Category, n: int) : list[dict]
+  # extract_articles(raw, start_date, end_date) : list[Article]
+}
+
+' ---------------------------------------------------------------------------
+' EngineCrawler
+' ---------------------------------------------------------------------------
+
+class EngineCrawler {
+  --
+  # find_initial_page(cat, start_date, end_date) : int
+  # get_page(cat: Category, n: int) : list[dict]
+  # extract_articles(raw, start_date, end_date) : list[Article]
+  - _start_page_known(n: int) : bool
+  - _advance(n: int) : int
+}
+
+' ---------------------------------------------------------------------------
+' Relationships
+' ---------------------------------------------------------------------------
+
+GeneralCrawler <|-- EngineCrawler : extends
+
+Context "1" o-- "1" MongoDB       : db
+GeneralCrawler "1" o-- "1" MongoDB   : db
+GeneralCrawler "1" o-- "1" Context   : context
+
+MongoDB ..> Category : <<uses>>
+MongoDB ..> Article  : <<uses>>
+Context ..> Article  : <<buffers>>
+GeneralCrawler ..> Category : <<uses>>
+GeneralCrawler ..> Article  : <<uses>>
+
+@enduml

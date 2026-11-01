@@ -1,0 +1,30 @@
+# Step 3 – MongoDB + MongoExpress
+# Stop the step-01 container first: docker stop mongodb
+# Run: docker compose -f 03-docker-compose.yml up -d
+# Then open: http://localhost:8081
+
+services:
+  mongodb:
+    image: mongo:8
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - mongo_data:/data/db
+
+  mongo-express:
+    image: mongo-express
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongodb:27017/
+    depends_on:
+      - mongodb
+
+volumes:
+  mongo_data:
+    external: true  # reuse the volume created in step 01

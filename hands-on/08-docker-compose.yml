@@ -1,0 +1,43 @@
+# Step 6 – Full stack: MongoDB + MongoExpress + API
+# Run: docker compose -f 06-docker-compose.yml up -d
+#
+# Services:
+#   localhost:27017  MongoDB
+#   localhost:8081   MongoExpress web UI
+#   localhost:8000   FastAPI  (/docs for Swagger UI)
+
+services:
+  mongodb:
+    image: mongo:8
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - mongo_data:/data/db
+
+  mongo-express:
+    image: mongo-express
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongodb:27017/
+    depends_on:
+      - mongodb
+
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      MONGODB_URL: mongodb://root:example@mongodb:27017/
+    depends_on:
+      - mongodb
+    command: uvicorn 07-api:app --host 0.0.0.0 --port 8000
+
+volumes:
+  mongo_data:
+    external: true

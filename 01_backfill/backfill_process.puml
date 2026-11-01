@@ -1,0 +1,54 @@
+@startuml backfill_process
+
+skinparam backgroundColor #0F172A
+skinparam activityBackgroundColor #1E293B
+skinparam activityBorderColor #334155
+skinparam activityFontColor #F1F5F9
+skinparam activityFontSize 16
+skinparam arrowColor #64748B
+skinparam arrowFontColor #94A3B8
+skinparam activityDiamondBackgroundColor #1E293B
+skinparam activityDiamondBorderColor #38BDF8
+skinparam activityDiamondFontColor #38BDF8
+skinparam partitionBackgroundColor #1E293B
+skinparam partitionBorderColor #334155
+skinparam partitionFontColor #94A3B8
+
+title Backfill Process
+
+start
+
+:Load category list\nfrom MongoDB;
+note right: extracted in\nprevious step
+
+partition "**For each category**" {
+
+  while (response not empty?) is (yes)
+
+    :Fetch page via paginated API;
+    note right: page=1 → static HTML\npage>1 → GET /api?url=<cat>&page=<n>
+
+    :Parse article list\nfrom HTML;
+
+    :For each article in page\ncollect (url, date);
+
+    if (article.date < start_date?) then (yes)
+      break
+    else (no)
+      if (article.date <= end_date?) then (yes)
+        :Store article stub\nin MongoDB;
+        note right: {url, date,\ncategory, newspaper}
+      endif
+    endif
+
+    :Advance to next page\n(page += 1);
+
+  endwhile (no)
+
+}
+
+:Return collected\narticle stubs;
+
+stop
+
+@enduml

@@ -1,0 +1,63 @@
+@startuml crawler_classes
+
+skinparam classAttributeIconSize 0
+skinparam classFontName "IBM Plex Sans"
+skinparam classFontSize 14
+skinparam classBackgroundColor #1E293B
+skinparam classBorderColor #334155
+skinparam classFontColor #F1F5F9
+skinparam classArrowColor #64748B
+skinparam backgroundColor #0F172A
+skinparam shadowing false
+skinparam roundCorner 8
+skinparam classBorderThickness 1.5
+
+abstract class Crawler {
+  + newspaper : str
+  + base_url : str
+  --
+  + detect() : bool
+  + extract_categories() : list
+  + backfill_news(cat) : list
+  + download_news(url) : Article
+}
+
+class WordPressCrawler {
+  + api_base : str = "/wp-json/wp/v2"
+  --
+  + detect() : bool
+  + extract_categories() : list
+  + backfill_news(cat) : list
+  + download_news(url) : Article
+}
+
+class BCubeCrawler {
+  + pagination_path : str
+  --
+  + detect() : bool
+  + extract_categories() : list
+  + backfill_news(cat, page) : list
+  + download_news(url) : Article
+}
+
+class VocentoCrawler {
+  + archive_path : str = "ajax/v22/archive"
+  --
+  + detect() : bool
+  + extract_categories() : list
+  + backfill_news(cat, date) : list
+  + download_news(url) : Article
+}
+
+class PrensaIberica {
+  + group : str = "Prensa Ibérica"
+  --
+  + get_newspaper_list() : list
+}
+
+Crawler <|-- WordPressCrawler
+Crawler <|-- BCubeCrawler
+Crawler <|-- VocentoCrawler
+BCubeCrawler <|-- PrensaIberica
+
+@enduml
